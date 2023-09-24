@@ -70,12 +70,12 @@ const ExChange = () => {
       </Typography>
       <Box width={'30%'} paddingBottom={5}>
         <FormControl fullWidth>
-          <InputLabel id='demo-simple-select-label'>Age</InputLabel>
+          <InputLabel id='Country-label'>Country</InputLabel>
           <Select
-            labelId='demo-simple-select-label'
-            id='demo-simple-select'
+            labelId='Country-label'
+            id='Country'
             value={countryName}
-            label='Age'
+            label='Country'
             onChange={handleChange}
           >
             {data?.map((item) => (

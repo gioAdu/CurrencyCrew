@@ -5,6 +5,7 @@ import { useQuery } from 'react-query'
 
 const api_url_by_country = 'https://api.api-ninjas.com/v1/airports?country='
 const api_url_name = 'https://api.api-ninjas.com/v1/airports?name='
+
 const Airport = () => {
   const router = useRouter()
   let debounceTimer
@@ -62,7 +63,7 @@ const Airport = () => {
     return response.json()
   }
 
-  const { data: AirportsData } = useQuery('Airports', fetchAirports, {
+  const { data: AirportsData, isLoading, error } = useQuery('Airports', fetchAirports, {
     refetchOnWindowFocus: false,
     refetchOnmount: false,
     refetchOnReconnect: false,
@@ -78,8 +79,14 @@ const Airport = () => {
     }
   }, [AirportsData])
 
-  console.log(AirportsData)
 
+	if(isLoading){
+		return <div>Loading ...</div>
+	}
+
+	if(error){
+		return <div>error something went wrong</div>
+	}
   return (
     <>
       <Typography variant='h4' paddingBottom={4}>

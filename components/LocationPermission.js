@@ -1,27 +1,24 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react';
 
-const LocationPermission = ({ onPermissionGranted, onPermissionDenied }) => {
+export const useGeoLocation = () => {
+  const [status, setStatus] = useState(null);
+  const [lat, setLat] = useState(null);
+  const [lng, setLng] = useState(null);
+
   useEffect(() => {
-    if ('geolocation' in navigator) {
-      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-        if (result.state === 'granted') {
-          onPermissionGranted()
-        } else {
-          result.onchange = () => {
-            if (result.state === 'granted') {
-              onPermissionGranted()
-            } else {
-              onPermissionDenied()
-            }
-          }
-        }
-      })
+    if (!navigator.geolocation) {
+      setStatus('Geolocation is not supported by your browser');
     } else {
-      onPermissionDenied()
+      setStatus('Locating...');
+      navigator.geolocation.getCurrentPosition((position) => {
+        setStatus('granted');
+        setLat(position.coords.latitude);
+        setLng(position.coords.longitude);
+      }, () => {
+        setStatus('Unable to retrieve your location');
+      });
     }
-  }, [onPermissionGranted, onPermissionDenied])
+  }, []);
 
-  return null
-}
-
-export default LocationPermission
+  return { status, lat, lng };
+};

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { Card, CardContent } from '@mui/material'
 
 export default function Home() {
-
   return (
-   <div>test</div>
+    <Card sx={{padding:5, marginY:3}}>
+      <CardContent></CardContent>
+    </Card>
   )
 }

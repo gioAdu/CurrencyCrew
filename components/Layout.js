@@ -1,84 +1,49 @@
 import { Card, CardContent, Container } from '@mui/material'
 import { useQuery } from 'react-query'
 import CountrySelect from './CountrySelect'
-import { useState } from 'react'
-import LocationPermission from './LocationPermission'
+import { useEffect, useState } from 'react'
+import { useGeoLocation } from './LocationPermission'
+import getCountryNameFromCoordinates from '@/lib/googleParser'
+import { useRouter } from 'next/router'
+import { CountriesMapper } from '@/lib/CountriesMapper'
 
 export default function Layout({ children }) {
-  const [locationPermission, setLocationPermission] = useState(null)
+  const router = useRouter()
+  const { status, lat, lng } = useGeoLocation()
+  const apiKey = 'AIzaSyCQlaWJHlvEuYiCXRUEGQf79EWxwkPR-hg'
+  const { data, isLoading, error } = CountriesMapper();
 
-  const handlePermissionGranted = () => {
-    setLocationPermission('granted')
-    // Now you can proceed with location-related tasks
-  }
 
-  const { isLoading, error, data } = useQuery(
-    'Countries',
-    () =>
-      fetch('https://restcountries.com/v3.1/all')
-        .then((res) => res.json())
-        .then((data) => {
-          const shortToCommon = {}
+  const [countryName, setCountryName] = useState('')
 
-          data.forEach((country) => {
-            shortToCommon[country.cca3] = country.name.common
-          })
+  useEffect(() => {
+    if (status === 'granted' && lat !== null && lng !== null) {
+      if (router.pathname === '/') {
+        getCountryNameFromCoordinates(lat, lng, apiKey)
+          .then((name) => setCountryName(name))
+          .catch((error) => console.error(error))
+      }
+    }
+  }, [lat, lng, apiKey])
 
-          return data?.map((country) => {
-            const currencyCode = country.currencies
-              ? country.currencies[Object.keys(country.currencies)[0]].name
-              : 'N/A'
+ 
 
-            let currencyName
-            let currencyKey
-            let currencySymbol
-
-            if (country.currencies) {
-              let firstCurrencyEntry = Object.entries(country.currencies)[0]
-              let tempCurrencyKey = firstCurrencyEntry[0]
-              let currencyDetails = firstCurrencyEntry[1]
-
-              currencyKey = tempCurrencyKey
-              currencyName = currencyDetails.name
-              currencySymbol = currencyDetails.symbol
-            } else {
-              currencyName = 'N/A'
-              currencySymbol = ''
-            }
-
-            const bordersCommonNames = country.borders
-              ? country.borders
-                  .map((shortName) => shortToCommon[shortName])
-                  .join(', ')
-              : ''
-
-            return {
-              name: country.name.common,
-              official: country.name.official,
-              currencyCode: currencyCode,
-              currencyName: currencyName,
-              currencySymbol: currencySymbol,
-              capital: country.capital ? country.capital[0] : 'N/A',
-              flag: country.flags.png,
-              short: country.cca3,
-              borders: bordersCommonNames,
-              population: country.population,
-              region: country.region ? country.region : 'N/A',
-              currencyKey: currencyKey,
-              altSpelling: country.altSpellings[0],
-            }
-          })
-        }),
-    { staleTime: Infinity, cacheTime: Infinity }
-  )
+  useEffect(() => {
+    if (countryName && data) {
+      // Find the country with matching short_name (cca2)
+      const matchingCountry = data.find(
+        (country) => country.name === countryName
+      )
+      
+      if (matchingCountry) {
+        // Programmatically navigate to the corresponding route
+        router.push(`/${matchingCountry.short}`)
+      }
+    }
+  }, [countryName])
 
   return (
     <Container>
-        {locationPermission === null && (
-        <LocationPermission
-          onPermissionGranted={handlePermissionGranted}
-        />
-      )}
       <Card>
         <CardContent>
           {isLoading ? <div>Loading...</div> : <CountrySelect data={data} />}
