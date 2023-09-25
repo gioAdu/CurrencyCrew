@@ -1,7 +1,6 @@
-import { Box, Card, CardContent, Tab, Tabs } from '@mui/material'
+import { Card, CardContent } from '@mui/material'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { useQuery } from 'react-query'
 import CountryCard from './CountryCard'
 

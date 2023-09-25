@@ -1,4 +1,5 @@
 import { Box, Grid, Input, Typography } from '@mui/material'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useQuery } from 'react-query'
@@ -10,11 +11,11 @@ const Airport = () => {
   const router = useRouter()
   let debounceTimer
 
-	useEffect(() => {
-		return () => {
-			clearTimeout(debounceTimer); // Clear the timer when the component unmounts
-		};
-	}, [])
+  useEffect(() => {
+    return () => {
+      clearTimeout(debounceTimer) // Clear the timer when the component unmounts
+    }
+  }, [])
 
   const shortName = router.query.countryName
 
@@ -63,7 +64,11 @@ const Airport = () => {
     return response.json()
   }
 
-  const { data: AirportsData, isLoading, error } = useQuery('Airports', fetchAirports, {
+  const {
+    data: AirportsData,
+    isLoading,
+    error,
+  } = useQuery('Airports', fetchAirports, {
     refetchOnWindowFocus: false,
     refetchOnmount: false,
     refetchOnReconnect: false,
@@ -79,16 +84,24 @@ const Airport = () => {
     }
   }, [AirportsData])
 
+  if (isLoading || !activeCountry) {
+    return <div>Loading ...</div>
+  }
 
-	if(isLoading){
-		return <div>Loading ...</div>
-	}
+  if (error) {
+    return <div>error something went wrong</div>
+  }
 
-	if(error){
-		return <div>error something went wrong</div>
-	}
   return (
     <>
+      <Head>
+        <title>{`${activeCountry.name} airports`}</title>
+        <meta
+          property='og:title'
+          content={`${activeCountry.name} airports`}
+          key='title'
+        />
+      </Head>
       <Typography variant='h4' paddingBottom={4}>
         Airports
       </Typography>

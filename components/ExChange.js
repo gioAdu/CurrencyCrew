@@ -8,10 +8,10 @@ import {
   Select,
   Typography,
 } from '@mui/material'
-import CountrySelect from './CountrySelect'
 import { useQuery } from 'react-query'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 const ExChange = () => {
   const { data, isLoading, error } = useQuery('Countries', { enabled: false })
@@ -65,6 +65,14 @@ const ExChange = () => {
 
   return (
     <>
+      <Head>
+        <title>{`${countryName} Information and Exchange Rates`}</title>
+        <meta
+          property='og:title'
+          content={`${countryName} Information and Exchange Rates`}
+          key='title'
+        />
+      </Head>
       <Typography variant='h4' paddingBottom={3}>
         Currency Exchange
       </Typography>
