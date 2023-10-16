@@ -61,7 +61,6 @@ const ExChange = () => {
       )
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           setExChangeRate(data.conversion_rate);
         })
         .catch((err) => console.log(err));
