@@ -9,7 +9,7 @@ To use this project, you will need to obtain an API key from [ExchangeRate API](
 5. Add the following line to your `.env` file, replacing `YOUR_API_KEY` with the API key you obtained:
 
 
-First, run the development server:
+Then, run the development server:
 
 ```bash
 npm run dev
