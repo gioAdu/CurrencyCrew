@@ -1,3 +1,5 @@
+# "CurrencyCrew: Discover global exchange rates and airports in an instant. Explore, compare, and plan with ease."
+
 ## Getting Started
 
 To use this project, you will need to obtain an API key from [ExchangeRate API](https://app.exchangerate-api.com/). Follow these steps to set up your API key:
