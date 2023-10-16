@@ -7,83 +7,92 @@ import {
   MenuItem,
   Select,
   Typography,
-} from '@mui/material'
-import { useQuery } from 'react-query'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import Head from 'next/head'
+} from '@mui/material';
+import { useQuery } from 'react-query';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import Head from 'next/head';
+import { headers } from '@/next.config';
 
 const ExChange = () => {
-  const { data, isLoading, error } = useQuery('Countries', { enabled: false })
+  const { data, isLoading, error } = useQuery('Countries', { enabled: false });
 
-  const router = useRouter()
+  const router = useRouter();
 
-  const shortName = router.query.countryName
+  const shortName = router.query.countryName;
 
-  const [selectedCountrySymbol, setSelectedCountrySymbol] = useState('')
+  const [selectedCountrySymbol, setSelectedCountrySymbol] = useState('');
 
-  const [countryName, setCountryName] = useState('')
+  const [countryName, setCountryName] = useState('');
 
-  const [inputValue, SetInputValue] = useState(0)
+  const [inputValue, SetInputValue] = useState(0);
 
-  const [exChangeRate, setExChangeRate] = useState(1)
+  const [exChangeRate, setExChangeRate] = useState(1);
 
   const handleChange = (event) => {
-    setCountryName(event.target.value)
-  }
+    setCountryName(event.target.value);
+  };
 
   const inputHandler = (event) => {
-    SetInputValue(event.target.value)
-  }
+    SetInputValue(event.target.value);
+  };
 
   useEffect(() => {
     if (router.query) {
-      const currentCountry = data?.find((item) => item.short === shortName)
+      const currentCountry = data?.find((item) => item.short === shortName);
 
       if (currentCountry) {
-        setSelectedCountrySymbol(currentCountry.currencyKey)
-        setCountryName(currentCountry.name)
+        setSelectedCountrySymbol(currentCountry.currencyKey);
+        setCountryName(currentCountry.name);
       }
     }
-  }, [router.query])
+  }, [router.query]);
 
   useEffect(() => {
-    if (exChangeCountry) {
+    if (exChangeCountry && selectedCountrySymbol) {
       fetch(
-        `https://api.exchangerate.host/convert?from=${selectedCountrySymbol}&to=${exChangeCountry.currencyKey}`
+        `https://v6.exchangerate-api.com/v6/${process.env.NEXT_PUBLIC_API_KEY}/pair/${selectedCountrySymbol}/${exChangeCountry.currencyKey}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        }
       )
         .then((response) => response.json())
         .then((data) => {
-          setExChangeRate(data.info.rate)
+          console.log(data);
+          setExChangeRate(data.conversion_rate);
         })
+        .catch((err) => console.log(err));
     }
-  }, [countryName])
+  }, [countryName]);
 
   const exChangeCountry = data
     ? data.find((item) => item.name === countryName)
-    : []
+    : [];
 
   return (
     <>
       <Head>
         <title>{`${countryName} Information and Exchange Rates`}</title>
         <meta
-          property='og:title'
+          property="og:title"
           content={`${countryName} Information and Exchange Rates`}
-          key='title'
+          key="title"
         />
       </Head>
-      <Typography variant='h4' paddingBottom={3}>
+      <Typography variant="h4" paddingBottom={3}>
         Currency Exchange
       </Typography>
       <Box width={'30%'} paddingBottom={5}>
         <FormControl fullWidth>
-          <InputLabel id='Country-label'>Country</InputLabel>
+          <InputLabel id="Country-label">Country</InputLabel>
           <Select
-            labelId='Country-label'
-            id='Country'
+            labelId="Country-label"
+            id="Country"
             value={countryName}
-            label='Country'
+            label="Country"
             onChange={handleChange}
           >
             {data?.map((item) => (
@@ -96,15 +105,15 @@ const ExChange = () => {
       </Box>
 
       <Box display={'flex'} width={'100%'} alignItems={'center'}>
-        <Box width='100%' height='100%'>
+        <Box width="100%" height="100%">
           <Input
-            type='number'
-            placeholder='0'
+            type="number"
+            placeholder="0"
             value={inputValue}
             onChange={inputHandler}
             fullWidth
             startAdornment={
-              <InputAdornment position='start'>
+              <InputAdornment position="start">
                 <div style={{ marginRight: '10px', color: 'gray' }}>
                   {selectedCountrySymbol}
                 </div>
@@ -113,20 +122,20 @@ const ExChange = () => {
           />
         </Box>
 
-        <Typography variant='h4' marginX={3}>
+        <Typography variant="h4" marginX={3}>
           =
         </Typography>
 
-        <Box width='100%' height={'100%'}>
+        <Box width="100%" height={'100%'}>
           <Input
-            type='number'
-            placeholder='0'
+            type="number"
+            placeholder="0"
             fullWidth
             disabled
             value={(inputValue * exChangeRate).toFixed(2)}
             startAdornment={
               exChangeCountry && (
-                <InputAdornment position='start' className='text'>
+                <InputAdornment position="start" className="text">
                   {exChangeCountry.currencyKey}
                 </InputAdornment>
               )
@@ -135,7 +144,7 @@ const ExChange = () => {
         </Box>
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default ExChange
+export default ExChange;
